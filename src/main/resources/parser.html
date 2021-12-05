@@ -1,0 +1,18 @@
+<script src="./parser.js"></script>
+<script>
+    function test(){
+        var content = document.getElementById("in").value;
+        var result = parse(content);
+        var out = '';
+        for(i in result.dblinkTables){
+            out += result[i];
+        }
+        document.getElementById("out").value=out;
+    }
+
+</script>
+<textarea id='in'></textarea>
+<br/>
+<button onclick="test()">test</button>
+<br/>
+<textarea id='out'></textarea>
