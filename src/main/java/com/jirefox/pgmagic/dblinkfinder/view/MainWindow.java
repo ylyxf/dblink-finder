@@ -59,7 +59,7 @@ public class MainWindow extends JFrame {
     private SimpleAttributeSet style = new SimpleAttributeSet();
 
     public MainWindow() {
-        setTitle("Dblink Table Observer");
+        setTitle("Dblink Table Finder");
         setSize(1024, 768);
         setResizable(false);
         setLocationRelativeTo(null);
