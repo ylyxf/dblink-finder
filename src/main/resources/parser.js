@@ -1,8 +1,7 @@
-function parse(content,dblinks,url,user){
+function parse(content, dblinks, url, user) {
     var result = {
-        dblinkTables:[],
-        notDblinkTables:[],
-        test:[]
+        dblinkTables: [],
+        notDblinkTables: []
     };
 
     if (content.indexOf("@") == -1) {
@@ -23,136 +22,43 @@ function parse(content,dblinks,url,user){
         if (segment.indexOf("@") == -1) {
             continue;
         }
-        
+
         var subSegs = segment.split("@");
         var left = subSegs[0];
         var right = subSegs[1];
 
+        //suffix 
         var rightContainsDblink = false;
-        for(var dblinkIndex in dblinks){
-            var dblinkName =  dblinks[dblinkIndex];
-            result.test.push(dblinkName);
-        }
-
-        if(!rightContainsDblink){
-            result.notDblinkTables.push(segment);
-            continue;
-        }
-        if(left.lastIndexOf(',')!=-1){
-            left= left.substr(left.lastIndexOf(',')+1)
-        }
-
-        if(left.lastIndexOf('=')!=-1){
-            left= left.substr(left.lastIndexOf('=')+1)
-        }
-
-        if(left.lastIndexOf("'")!=-1){
-            left= left.substr(left.lastIndexOf("'")+1)
-        }
-
-        if(left.lastIndexOf('(')!=-1){
-            left= left.substr(left.lastIndexOf('(')+1)
-        }
-
-        
-        if(left.lastIndexOf("'")){
-            left= left.substr(left.lastIndexOf("'")+1)
-        }
-
-        if(left.lastIndexOf('!')!=-1){
-            left= left.substr(left.lastIndexOf('!')+1)
-        }
-
-        if(left.lastIndexOf(';')!=-1){
-            left= left.substr(left.lastIndexOf(';')+1)
-        }
-
-        if(left.lastIndexOf('%')!=-1){
-            left= left.substr(left.lastIndexOf('%')+1)
-        }
-
-        if(left.lastIndexOf(':')!=-1){
-            left= left.substr(left.lastIndexOf(':')+1)
-        }
-
-        left = left.trim();
-        if(left == ''){
-            result.notDblinkTables.push(segment);
+        dblinks.forEach(function (val) {
+            if (right.toUpperCase().indexOf(val) == 0) {
+                rightContainsDblink = true;
+            }
+        })
+        if (!rightContainsDblink) {
+            result.notDblinkTables.push("not valid dblink name after @:" + segment);
             continue;
         }
 
-        if(left.lastIndexOf('.')==-1){
-            result.notDblinkTables.push(segment);
+        var rightExcludeLetters = ["-",",", "(", ")", "'","/*","*/","="];
+        rightExcludeLetters.forEach(function (excludeLetter) {
+            if (right.indexOf(excludeLetter) != -1) {
+                right = right.substr(0, right.indexOf(excludeLetter));
+            }
+        })
+
+        var leftExcludeLetters = ["-",",", "(", ")", "'","/*","*/","="];
+        leftExcludeLetters.forEach(function (excludeLetter) {
+            if (left.lastIndexOf(excludeLetter) != -1) {
+                left = left.substr(left.lastIndexOf(excludeLetter)+excludeLetter.length);
+            }
+        })
+
+        if(left.trim().length==0){
+            result.notDblinkTables.push("length is 0 before @ when replace leftExcludeLetters:  " + segment);
             continue;
         }
 
-        //-----
-
-        if(right.indexOf(',')!=-1){
-            right = right.substr(0,right.indexOf(','));
-        }
-
-        if(right.indexOf("'")!=-1){
-            right = right.substr(0,right.indexOf("'"));
-        }
-
-        if(right.indexOf('.')!=-1){
-            right = right.substr(0,right.indexOf('.'));
-        }
-
-
-        if(right.indexOf('(')!=-1){
-            right = right.substr(0,right.indexOf('('));
-        }
-
-        if(right.indexOf(')')!=-1){
-            right = right.substr(0,right.indexOf(')'));
-        }
-
-        if(right.indexOf(';')!=-1){
-            right = right.substr(0,right.indexOf(';'));
-        }
-
-        //---
-        if(right.indexOf("--") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        if(right.indexOf("/*") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        if(right.indexOf("*/") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        right = right.trim();
-        if(right == ''){
-            result.notDblinkTables.push(segment);
-            continue;
-        }
-
-
-        //----
-        if(left.indexOf("--") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        if(left.indexOf("/*") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        if(left.indexOf("*/") != -1){
-            result.notDblinkTables.push(segment);
-            continue;
-        }  
-
-        var dblinktable = left+'@'+right;
+        var dblinktable = left + '@' + right;
         result.dblinkTables.push(dblinktable);
     }
 
