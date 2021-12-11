@@ -38,10 +38,6 @@ public class MainWindow extends JFrame {
 
     private JComboBox<String> displayTypeComboBox = new JComboBox<String>();
 
-    private JLabel viewPrefixLabel = new JLabel("Create Dblink Table To View's Prefix:");
-
-    private JTextField viewPrefixTextField = new JTextField("dblv_");
-
     private JButton genSqlBtn = new JButton("generate sql");
 
     private JTree dblinkTree = new JTree();
@@ -53,7 +49,7 @@ public class MainWindow extends JFrame {
 
     private TreeService treeService;
 
-    private GenSqlService genViewService;
+    private GenSqlService genSqlService;
 
 
     private SimpleAttributeSet style = new SimpleAttributeSet();
@@ -68,7 +64,7 @@ public class MainWindow extends JFrame {
         searchService = new SearchService(this);
         Connection h2 = searchService.initH2();
         treeService = new TreeService(this, h2);
-        genViewService = new GenSqlService(this, h2);
+        genSqlService = new GenSqlService(this, h2);
     }
 
     public void init() {
@@ -149,14 +145,10 @@ public class MainWindow extends JFrame {
         opSep.setPreferredSize(new Dimension(5, 20));
         operationPanel.add(opSep, "span ");
 
-        operationPanel.add(viewPrefixLabel);
-        operationPanel.add(viewPrefixTextField, "w 60!");
-
         genSqlBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String prefix = viewPrefixTextField.getText();
-                genViewService.genViewSql(prefix);
+                genSqlService.genSql();
             }
         });
         operationPanel.add(genSqlBtn);
